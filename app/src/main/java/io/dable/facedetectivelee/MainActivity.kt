@@ -15,6 +15,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
@@ -25,9 +26,9 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.opencv.android.OpenCVLoader
 import org.opencv.android.Utils
 import org.opencv.core.Mat
+import org.opencv.imgproc.Imgproc.rectangle
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -76,8 +77,8 @@ class MainActivity : AppCompatActivity() {
             hintText.visibility = INVISIBLE
             detailsGroup.visibility = VISIBLE
             val bitmap = getCapturedImage(uri)
-            imageView.setImageBitmap(bitmap)
             detectFace(bitmap, faces_value)
+            imageView.setImageBitmap(bitmap)
         }
     }
 
@@ -99,9 +100,21 @@ class MainActivity : AppCompatActivity() {
         Utils.bitmapToMat(bmp32, mat)
         GlobalScope.launch {
             val rectangles = FaceDetection.detectFaces(mat)
-            val faceCount = rectangles.elemSize()
+            val rectSize= rectangles.size()
+            val rows = rectSize.height.toInt()
+            val cols = rectSize.width.toInt()
+
             runOnUiThread {
-                facesValue.text = faceCount.toString()
+                facesValue.text = (rows * cols).toString()
+                if (rows > 0 && cols > 0) {
+                    for (row in 0..(rows-1)) {
+                        for (col in 0..(cols-1)) {
+                            val rect =rectangles[row, col]
+                            Log.d("FACERECT", "${rect}")
+                        }
+                    }
+                }
+                Log.d("FACERECT", "--")
             }
         }
 
