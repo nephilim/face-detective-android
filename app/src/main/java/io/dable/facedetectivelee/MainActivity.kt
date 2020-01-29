@@ -28,6 +28,9 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.opencv.android.Utils
 import org.opencv.core.Mat
+import org.opencv.core.Point
+import org.opencv.core.Rect
+import org.opencv.core.Scalar
 import org.opencv.imgproc.Imgproc.rectangle
 import java.io.File
 
@@ -109,12 +112,17 @@ class MainActivity : AppCompatActivity() {
                 if (rows > 0 && cols > 0) {
                     for (row in 0..(rows-1)) {
                         for (col in 0..(cols-1)) {
-                            val rect =rectangles[row, col]
+                            val rect=rectangles[row, col]
                             Log.d("FACERECT", "${rect}")
+                            rectangle(mat,
+                                Point(rect[0], rect[1]),
+                                Point(rect[0] + rect[2], rect[1] + rect[3]),
+                                Scalar(255.0,200.0,0.0), 5)
                         }
                     }
                 }
-                Log.d("FACERECT", "--")
+                Utils.matToBitmap(mat, image)
+                imageView.setImageBitmap(image)
             }
         }
 
